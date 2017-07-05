@@ -21,7 +21,8 @@ var handlebars = require('express3-handlebars').create({
 	}
 }
 });
-var fortune = require('./fortunes.js');
+var fortune = require('./js/fortunes.js');
+var weather = require('./js/weather.js');
 
 var app = express();
 var admin = express();
@@ -81,6 +82,12 @@ app.get('/toJson/:id', function(req, res){
 app.use('/admin', admin);
 
 app.use(express.static(__dirname + '/public'));
+
+app.use(function(req, res, next){
+	if(!res.locals.partials) res.locals.partials = {};
+	res.locals.partials.weather = weather.getWeather();
+	next();
+});
 
 //Customize 404 page
 app.use(function(req, res){

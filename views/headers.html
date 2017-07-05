@@ -1,0 +1,18 @@
+<ul>
+	{{#each headers}}
+	<li>
+		{{name}} : {{value}}
+	</li>
+	{{/each}}
+</ul>
+
+
+{{#unless noexist}}
+<p>
+	Nothing will display!
+</p>
+{{/unless}}
+
+{{#section 'head'}}
+	<input type="date" name="dt">
+{{/section}}
