@@ -1,5 +1,26 @@
 var express = require('express');
-var handlebars = require('express3-handlebars').create({defaultLayout:'main'});
+var handlebars = require('express3-handlebars').create({
+	defaultLayout: 'main',
+	extname: '.html',
+	helpers: {
+	section: function(name, options){
+		if(!this._sections) this._sections = {};
+
+		console.log('%s', "This is a section function in helpers object");
+
+		console.log('%s', "Its name is " + name);
+
+		console.dir(options);
+
+		console.dir(this._sections);
+
+		this._sections[name] = options.fn(this);
+
+
+		return name + ' Section is Here!!!!';
+	}
+}
+});
 var fortune = require('./fortunes.js');
 
 var app = express();
@@ -12,12 +33,12 @@ admin.get('/', function(req,res){
 
 admin.on('mount', function(parent){
 	console.log('Admin Mount');
-	console.log(parent);
+	//console.dir(parent);
 });
 
-app.engine('handlebars', handlebars.engine);
+app.engine('html', handlebars.engine);
 
-app.set('view engine', 'handlebars');
+app.set('view engine', 'html');
 
 app.set('port', process.env.PORT || 3000);
 
@@ -33,25 +54,23 @@ app.get('/about', function(req, res){
 });
 
 app.get('/headers', function(req, res){
-	var s = '';
+	console.dir('Request Body:' + req.body);
+	console.dir('Request Query:' + req.query);
+	console.dir('Request Params:' + req.params);
 
-	console.log('Request Body:' + req.body);
-	console.log('Request Query:' + req.query);
-	console.log('Request Params:' + req.params);
-
-	res.type('text/plain');
+	var headers = [];
 
 	for(var name in req.headers) {
-		s += name + ' : ' + req.headers[name] + '\n';
+		headers.push({name: name, value: req.headers[name]});
 	}
 
-	res.send(s);
+	res.render('headers', {headers: headers});
 });
 
 app.get('/toJson/:id', function(req, res){
-	console.log('Query x: ' + req.query.x);
-	console.log('Params id: ' + req.params.id);
-	console.log(req.route);
+	console.dir('Query: ' + req.query);
+	console.dir('Params: ' + req.params);
+	console.dir(req.route);
 	console.log(req.ip);
 	console.log('hostname:' + req.hostname);
 	console.log('path:' + req.path);
@@ -79,7 +98,3 @@ app.use(function(err, req, res, next){
 app.listen(app.get('port'), function(){
 	console.log('Express started on http://localhost:' + app.get('port') + '; press Ctrl-C to terminate.');
 });
-
-var test = function(){
-	alert(123);
-};
